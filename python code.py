@@ -1,5 +1,20 @@
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.model_selection import train_test_split
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.metrics import (
+    confusion_matrix, accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, roc_curve, mean_squared_error, auc
+)
+from sklearn.inspection import PartialDependenceDisplay
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.svm import SVC
+from sklearn.model_selection import GridSearchCV
 
 # Load the data
 file_path = "heart-attack-risk-prediction-dataset.csv"
@@ -36,18 +51,6 @@ print(f"Test set size: {X_test.shape}")
 ##################################
 # LDA and QDA ####################
 ##################################
-
-# 1.1 Import required libraries (already minimal set)
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.metrics import (
-    confusion_matrix, accuracy_score, precision_score, recall_score,
-    f1_score, roc_auc_score, roc_curve, mean_squared_error
-)
-from sklearn.inspection import PartialDependenceDisplay
 
 # Define a helper function to calculate evaluation metrics
 def evaluate_model(y_true, y_pred, y_prob, model_name):
@@ -130,9 +133,6 @@ model_results = [lda_metrics, qda_metrics]
 # K-nn Classification ############
 ##################################
 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler
-
 # Scale the data
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
@@ -175,8 +175,6 @@ y_test_prob_knn = knn_best.predict_proba(X_test_scaled)[:, 1]
 knn_metrics = evaluate_model(y_test, y_test_pred_knn, y_test_prob_knn, f"k-NN (k={best_k})")
 model_results.append(knn_metrics)
 
-from sklearn.neighbors import KNeighborsClassifier
-
 # Train k-NN with k=25
 knn_25 = KNeighborsClassifier(n_neighbors=25)
 knn_25.fit(X_train_scaled, y_train)
@@ -190,8 +188,6 @@ knn25_metrics = evaluate_model(y_test, y_test_pred_knn25, y_test_prob_knn25, "k-
 
 # Save the results
 model_results.append(knn25_metrics)
-
-from sklearn.ensemble import RandomForestClassifier
 
 ##################################
 # Random Forests #################
@@ -242,11 +238,6 @@ model_results.append(rf_top10_metrics)
 ##################################
 # LASSO Logistic Regression ######
 ##################################
-
-from sklearn.linear_model import LogisticRegressionCV
-from sklearn.preprocessing import StandardScaler
-import numpy as np
-import matplotlib.pyplot as plt
 
 # Standardize features
 scaler_lasso = StandardScaler()
@@ -347,9 +338,6 @@ model_results.extend([lasso_min_05, lasso_se_05, lasso_min_04, lasso_se_04])
 # Support Vector Machine #########
 ##################################
 
-from sklearn.svm import SVC
-from sklearn.model_selection import GridSearchCV
-
 # Train initial basic SVM (RBF kernel)
 svm_basic = SVC(kernel='rbf', probability=True, random_state=123)
 svm_basic.fit(X_train_scaled, y_train)
@@ -391,7 +379,6 @@ svm_best_metrics = evaluate_model(y_test, y_test_pred_svm_best, y_test_prob_svm_
 model_results.append(svm_best_metrics)
 
 # Plot ROC Curve for best SVM
-from sklearn.metrics import roc_curve, auc
 
 fpr, tpr, _ = roc_curve(y_test, y_test_prob_svm_best)
 roc_auc = auc(fpr, tpr)
